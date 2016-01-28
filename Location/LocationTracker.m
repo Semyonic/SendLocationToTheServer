@@ -258,43 +258,35 @@
     
     //TODO: Your code to send the self.myLocation and self.myLocationAccuracy to your server
     
-    NSString *latText;
-    NSString *lonText;
-
-    CLLocationCoordinate2D sendLoc = self.myLocation;
-    sendLoc.latitude = [latText doubleValue];
-    sendLoc.longitude  =[lonText doubleValue];
     
-    NSURL *url = [NSURL URLWithString:@"http://localhost/server.php"];
-    NSString *post = [NSString stringWithFormat:@"latitude=%@&longitude=%@",latText,lonText];
     
-    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url];
-    // set POST method
+    NSString *noteDataString = [NSString stringWithFormat:@"latitude=%f&longitude=%f@", self.myLocation.latitude, self.myLocation.longitude];
+    NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: nil delegateQueue: [NSOperationQueue mainQueue]];
+    
+    //Setting connection to database page
+    NSURL * url = [NSURL URLWithString:@"http://192.168.1.2/index.php"];
+    NSMutableURLRequest * urlRequest = [NSMutableURLRequest requestWithURL:url];
     [urlRequest setHTTPMethod:@"POST"];
-    // adding keys with values
-    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-    NSString *postLength = [NSString stringWithFormat:@"%lu",(unsigned long)[postData length]];
-    [urlRequest addValue:postLength forHTTPHeaderField:@"Content-Length"];
-    [urlRequest setHTTPBody:postData];
+    //Send data
+    [urlRequest setHTTPBody:[noteDataString dataUsingEncoding:NSUTF8StringEncoding]];
     
-    NSURLSession *urlSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration]];
-    
-    NSURLSessionDownloadTask *urlSessionDownloadTask = [urlSession downloadTaskWithRequest:urlRequest completionHandler:^(NSURL *localfile, NSURLResponse *response, NSError *error) {
+    NSURLSessionDataTask * dataTask =[defaultSession dataTaskWithRequest:urlRequest completionHandler:^(NSData *dataRaw, NSURLResponse *header, NSError *error) {
+        NSDictionary *json = [NSJSONSerialization
+                              JSONObjectWithData:dataRaw
+                              options:kNilOptions error:&error];
         
-    NSData *data = [NSData dataWithContentsOfURL:localfile];
-    //do what you want with your data here....
-        /*
-         ...
-         ....
-         .....
-         */
+        NSString *status = json[@"status"];
+        
+        if([status isEqual:@"1"]){
+            NSLog(@"Data Sent to Server !");
+            //Clear the array for next update
+            [self.shareModel.myLocationArray removeAllObjects];
+             self.shareModel.myLocationArray = nil;
+             self.shareModel.myLocationArray = [[NSMutableArray alloc]init];
+        } else {
+            NSLog(@"Data Stream FAILED !");
+        }
     }];
-    [urlSessionDownloadTask resume];
-    
-    //After sending the location to the server successful, remember to clear the current array with the following code. It is to make sure that you clear up old location in the array and add the new locations from locationManager
-    
-    [self.shareModel.myLocationArray removeAllObjects];
-    self.shareModel.myLocationArray = nil;
-    self.shareModel.myLocationArray = [[NSMutableArray alloc]init];
-}
-@end
+    [dataTask resume];
+}@end

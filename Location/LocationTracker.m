@@ -102,8 +102,6 @@
         }
 	}
 }
-
-
 - (void)stopLocationTracking {
     NSLog(@"stopLocationTracking");
     
@@ -178,9 +176,7 @@
                                                     selector:@selector(stopLocationDelayBy10Seconds)
                                                     userInfo:nil
                                                      repeats:NO];
-
 }
-
 
 //Stop the locationManager
 -(void)stopLocationDelayBy10Seconds{
@@ -189,7 +185,6 @@
     
     NSLog(@"locationManager stop Updating after 10 seconds");
 }
-
 
 - (void)locationManager: (CLLocationManager *)manager didFailWithError: (NSError *)error
 {
@@ -256,11 +251,17 @@
     
     NSLog(@"Send to Server: Latitude(%f) Longitude(%f) Accuracy(%f)",self.myLocation.latitude, self.myLocation.longitude,self.myLocationAccuracy);
     
-    //TODO: Your code to send the self.myLocation and self.myLocationAccuracy to your server
-    
-    
-    
-    NSString *noteDataString = [NSString stringWithFormat:@"latitude=%f&longitude=%f@", self.myLocation.latitude, self.myLocation.longitude];
+    /*Send the
+     self.myLocation
+     
+     and
+     
+     self.myLocationAccuracy
+     to your server
+    */
+    //NSString *DataString = [NSString stringWithFormat:@"latitude=%f&longitude=%f@", self.myLocation.latitude, self.myLocation.longitude];
+    NSString *lati = [NSString stringWithFormat:@"%f", self.myLocation.latitude];
+    NSString *longt = [NSString stringWithFormat:@"%f", self.myLocation.longitude];
     NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: nil delegateQueue: [NSOperationQueue mainQueue]];
     
@@ -269,21 +270,19 @@
     NSMutableURLRequest * urlRequest = [NSMutableURLRequest requestWithURL:url];
     [urlRequest setHTTPMethod:@"POST"];
     //Send data
-    [urlRequest setHTTPBody:[noteDataString dataUsingEncoding:NSUTF8StringEncoding]];
+    [urlRequest setHTTPBody:[lati dataUsingEncoding:NSUTF8StringEncoding]];
+    [urlRequest setHTTPBody:[longt dataUsingEncoding:NSUTF8StringEncoding]];
     
     NSURLSessionDataTask * dataTask =[defaultSession dataTaskWithRequest:urlRequest completionHandler:^(NSData *dataRaw, NSURLResponse *header, NSError *error) {
-        NSDictionary *json = [NSJSONSerialization
-                              JSONObjectWithData:dataRaw
-                              options:kNilOptions error:&error];
-        
-        NSString *status = json[@"status"];
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:dataRaw options:kNilOptions error:&error];
+    NSString *status = json[@"status"];
         
         if([status isEqual:@"1"]){
             NSLog(@"Data Sent to Server !");
             //Clear the array for next update
             [self.shareModel.myLocationArray removeAllObjects];
-             self.shareModel.myLocationArray = nil;
-             self.shareModel.myLocationArray = [[NSMutableArray alloc]init];
+            self.shareModel.myLocationArray = nil;
+            self.shareModel.myLocationArray = [[NSMutableArray alloc]init];
         } else {
             NSLog(@"Data Stream FAILED !");
         }

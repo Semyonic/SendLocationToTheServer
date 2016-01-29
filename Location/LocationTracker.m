@@ -15,28 +15,28 @@
 @implementation LocationTracker
 
 + (CLLocationManager *)sharedLocationManager {
-	static CLLocationManager *_locationManager;
-	
-	@synchronized(self) {
-		if (_locationManager == nil) {
-			_locationManager = [[CLLocationManager alloc] init];
+    static CLLocationManager *_locationManager;
+    
+    @synchronized(self) {
+        if (_locationManager == nil) {
+            _locationManager = [[CLLocationManager alloc] init];
             _locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation;
-			_locationManager.allowsBackgroundLocationUpdates = YES;
-			_locationManager.pausesLocationUpdatesAutomatically = NO;
-		}
-	}
-	return _locationManager;
+            _locationManager.allowsBackgroundLocationUpdates = YES;
+            _locationManager.pausesLocationUpdatesAutomatically = NO;
+        }
+    }
+    return _locationManager;
 }
 
 - (id)init {
-	if (self==[super init]) {
+    if (self==[super init]) {
         //Get the share model and also initialize myLocationArray
         self.shareModel = [LocationShareModel sharedModel];
         self.shareModel.myLocationArray = [[NSMutableArray alloc]init];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
-	}
-	return self;
+    }
+    return self;
 }
 
 -(void)applicationEnterBackground{
@@ -78,12 +78,12 @@
 
 - (void)startLocationTracking {
     NSLog(@"startLocationTracking");
-
-	if ([CLLocationManager locationServicesEnabled] == NO) {
+    
+    if ([CLLocationManager locationServicesEnabled] == NO) {
         NSLog(@"locationServicesEnabled false");
-		UIAlertView *servicesDisabledAlert = [[UIAlertView alloc] initWithTitle:@"Location Services Disabled" message:@"You currently have all location services for this device disabled" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-		[servicesDisabledAlert show];
-	} else {
+        UIAlertView *servicesDisabledAlert = [[UIAlertView alloc] initWithTitle:@"Location Services Disabled" message:@"You currently have all location services for this device disabled" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [servicesDisabledAlert show];
+    } else {
         CLAuthorizationStatus authorizationStatus= [CLLocationManager authorizationStatus];
         
         if(authorizationStatus == kCLAuthorizationStatusDenied || authorizationStatus == kCLAuthorizationStatusRestricted){
@@ -96,11 +96,11 @@
             locationManager.distanceFilter = kCLDistanceFilterNone;
             
             if(IS_OS_8_OR_LATER) {
-              [locationManager requestAlwaysAuthorization];
+                [locationManager requestAlwaysAuthorization];
             }
             [locationManager startUpdatingLocation];
         }
-	}
+    }
 }
 - (void)stopLocationTracking {
     NSLog(@"stopLocationTracking");
@@ -110,8 +110,8 @@
         self.shareModel.timer = nil;
     }
     
-	CLLocationManager *locationManager = [LocationTracker sharedLocationManager];
-	[locationManager stopUpdatingLocation];
+    CLLocationManager *locationManager = [LocationTracker sharedLocationManager];
+    [locationManager stopUpdatingLocation];
 }
 
 #pragma mark - CLLocationManagerDelegate Methods
@@ -173,9 +173,9 @@
     }
     
     self.shareModel.delay10Seconds = [NSTimer scheduledTimerWithTimeInterval:3 target:self
-                                                    selector:@selector(stopLocationDelayBy10Seconds)
-                                                    userInfo:nil
-                                                     repeats:NO];
+                                                                    selector:@selector(stopLocationDelayBy10Seconds)
+                                                                    userInfo:nil
+                                                                     repeats:NO];
 }
 
 //Stop the locationManager
@@ -188,7 +188,7 @@
 
 - (void)locationManager: (CLLocationManager *)manager didFailWithError: (NSError *)error
 {
-   // NSLog(@"locationManager error:%@",error);
+    // NSLog(@"locationManager error:%@",error);
     
     switch([error code])
     {
@@ -207,7 +207,7 @@
         {
             
         }
-        break;
+            break;
     }
 }
 
@@ -258,7 +258,7 @@
      
      self.myLocationAccuracy
      to your server
-    */
+     */
     
     //NSString *DataString = [NSString stringWithFormat:@"latitude=%f&longitude=%f@", self.myLocation.latitude, self.myLocation.longitude];
     NSString *post = [[NSString alloc] initWithFormat:@"lati=%f& longt=%f&", self.myLocation.latitude, self.myLocation.longitude];
@@ -276,8 +276,8 @@
     [urlRequest setHTTPBody:postData];
     
     NSURLSessionDataTask * dataTask =[defaultSession dataTaskWithRequest:urlRequest completionHandler:^(NSData *dataRaw, NSURLResponse *header, NSError *error) {
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:dataRaw options:kNilOptions error:&error];
-    NSString *status = json[@"status"];
+        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:dataRaw options:kNilOptions error:&error];
+        NSString *status = json[@"status"];
         
         if([status isEqual:@"1"]){
             NSLog(@"Data Sent to Server !");

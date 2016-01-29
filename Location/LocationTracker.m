@@ -259,19 +259,21 @@
      self.myLocationAccuracy
      to your server
     */
+    
     //NSString *DataString = [NSString stringWithFormat:@"latitude=%f&longitude=%f@", self.myLocation.latitude, self.myLocation.longitude];
-    NSString *lati = [NSString stringWithFormat:@"%f", self.myLocation.latitude];
-    NSString *longt = [NSString stringWithFormat:@"%f", self.myLocation.longitude];
+    NSString *post = [[NSString alloc] initWithFormat:@"lati=%f& longt=%f&", self.myLocation.latitude, self.myLocation.longitude];
     NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: nil delegateQueue: [NSOperationQueue mainQueue]];
     
     //Setting connection to database page
-    NSURL * url = [NSURL URLWithString:@"http://192.168.1.2/index.php"];
+    NSURL * url = [NSURL URLWithString:@"http://192.168.1.2/test2.php"];
     NSMutableURLRequest * urlRequest = [NSMutableURLRequest requestWithURL:url];
+    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+    [urlRequest setValue:postLength forHTTPHeaderField:@"Content-Length"];
+    [urlRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
     [urlRequest setHTTPMethod:@"POST"];
-    //Send data
-    [urlRequest setHTTPBody:[lati dataUsingEncoding:NSUTF8StringEncoding]];
-    [urlRequest setHTTPBody:[longt dataUsingEncoding:NSUTF8StringEncoding]];
+    [urlRequest setHTTPBody:postData];
     
     NSURLSessionDataTask * dataTask =[defaultSession dataTaskWithRequest:urlRequest completionHandler:^(NSData *dataRaw, NSURLResponse *header, NSError *error) {
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:dataRaw options:kNilOptions error:&error];

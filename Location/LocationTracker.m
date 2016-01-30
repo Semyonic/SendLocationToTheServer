@@ -266,7 +266,7 @@
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: nil delegateQueue: [NSOperationQueue mainQueue]];
     
     //Setting connection to database page
-    NSURL * url = [NSURL URLWithString:@"http://192.168.1.2/test2.php"];
+    NSURL * url = [NSURL URLWithString:@"http://piathome.redirectme.net/test2.php"];
     NSMutableURLRequest * urlRequest = [NSMutableURLRequest requestWithURL:url];
     NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];

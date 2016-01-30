@@ -261,12 +261,12 @@
      */
     
     //NSString *DataString = [NSString stringWithFormat:@"latitude=%f&longitude=%f@", self.myLocation.latitude, self.myLocation.longitude];
-    NSString *post = [[NSString alloc] initWithFormat:@"lati=%f& longt=%f&", self.myLocation.latitude, self.myLocation.longitude];
+    NSString *post = [[NSString alloc] initWithFormat:@"Enlem=%f& Boylam=%f& Isabet=%f&", self.myLocation.latitude, self.myLocation.longitude,self.myLocationAccuracy];
     NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: nil delegateQueue: [NSOperationQueue mainQueue]];
     
     //Setting connection to database page
-    NSURL * url = [NSURL URLWithString:@"http://piathome.redirectme.net/test2.php"];
+    NSURL * url = [NSURL URLWithString:@"http://piathome.redirectme.net/getGeoData.php"];
     NSMutableURLRequest * urlRequest = [NSMutableURLRequest requestWithURL:url];
     NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];

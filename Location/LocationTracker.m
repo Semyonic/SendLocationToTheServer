@@ -249,36 +249,30 @@
         self.myLocationAccuracy =[[myBestLocation objectForKey:ACCURACY]floatValue];
     }
     
+    //Debug only
     NSLog(@"Send to Server: Latitude(%f) Longitude(%f) Accuracy(%f)",self.myLocation.latitude, self.myLocation.longitude,self.myLocationAccuracy);
-    
-    /*Send the
-     self.myLocation
-     
-     and
-     
-     self.myLocationAccuracy
-     to your server
-     */
-    
-    //NSString *DataString = [NSString stringWithFormat:@"latitude=%f&longitude=%f@", self.myLocation.latitude, self.myLocation.longitude];
+    //Add location data for POST request
     NSString *post = [[NSString alloc] initWithFormat:@"Enlem=%f& Boylam=%f& Isabet=%f&", self.myLocation.latitude, self.myLocation.longitude,self.myLocationAccuracy];
+    //Create Session for request
     NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: nil delegateQueue: [NSOperationQueue mainQueue]];
     
-    //Setting connection to database page
+    //Create database connection
     NSURL * url = [NSURL URLWithString:@"http://piathome.redirectme.net/getGeoData.php"];
     NSMutableURLRequest * urlRequest = [NSMutableURLRequest requestWithURL:url];
     NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+    //Send POST request
     [urlRequest setValue:postLength forHTTPHeaderField:@"Content-Length"];
     [urlRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
     [urlRequest setHTTPMethod:@"POST"];
     [urlRequest setHTTPBody:postData];
-    
+    //Keep up the connection
     NSURLSessionDataTask * dataTask =[defaultSession dataTaskWithRequest:urlRequest completionHandler:^(NSData *dataRaw, NSURLResponse *header, NSError *error) {
         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:dataRaw options:kNilOptions error:&error];
         NSString *status = json[@"status"];
         
+        //Check that data reaches the server then cleanup the array for next transmission
         if([status isEqual:@"1"]){
             NSLog(@"Data Sent to Server !");
             //Clear the array for next update
